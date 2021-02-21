@@ -4,11 +4,11 @@ set -eu -o pipefail
 
 # Windows
 # #
-# win-x32
+# win-x86
 ./setup.sh libdeflate-1.7-windows-i686-bin.zip \
 	https://github.com/ebiggers/libdeflate/releases/download/v1.7/libdeflate-1.7-windows-i686-bin.zip \
 	"8b3f61ac9bdffa061fd277b5e2c8e7bd4175719e2e903b8aca437efa4fa2de09" \
-	"win-x32"
+	"win-x86"
 # win-x64
 ./setup.sh libdeflate-1.7-windows-x86_64-bin.zip \
 	https://github.com/ebiggers/libdeflate/releases/download/v1.7/libdeflate-1.7-windows-x86_64-bin.zip \
