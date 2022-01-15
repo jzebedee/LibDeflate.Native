@@ -18,11 +18,12 @@ jobs:
       CC: ${{ matrix.compiler }}
     steps:
     - uses: actions/checkout@v2
-    - name: Checkout libdeflate and install dependencies
+      name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
         ref: 'v1.7'
 #       path: 'libdeflate-src'
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind
@@ -37,6 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        name: Checkout libdeflate
+        with:
+          repository: 'ebiggers/libdeflate'
+          ref: 'v1.7'
+#         path: 'libdeflate-src'
       - uses: uraimo/run-on-arch-action@v2.0.5
         with:
           arch: ${{ matrix.arch }}
@@ -74,6 +80,11 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+      name: Checkout libdeflate
+      with:
+        repository: 'ebiggers/libdeflate'
+        ref: 'v1.7'
+#       path: 'libdeflate-src'
     - run: make all check
 
   windows-build-and-test:
@@ -81,6 +92,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+      name: Checkout libdeflate
+      with:
+        repository: 'ebiggers/libdeflate'
+        ref: 'v1.7'
+#       path: 'libdeflate-src'
     - shell: bash
       run: |
         PATH="C:\\msys64\\mingw64\\bin:C:\\msys64\\usr\\bin:$PATH" \
@@ -91,6 +107,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      name: Checkout libdeflate
+      with:
+        repository: 'ebiggers/libdeflate'
+        ref: 'v1.7'
+#       path: 'libdeflate-src'
     - name: Install dependencies
       run: |
         sudo apt-get update
