@@ -18,7 +18,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
+        ref: 'v1.8'
 #       path: 'libdeflate-src'
     - name: Install dependencies
       run: |
@@ -38,7 +38,7 @@ jobs:
         name: Checkout libdeflate
         with:
           repository: 'ebiggers/libdeflate'
-          ref: 'v1.7'
+          ref: 'v1.8'
 #         path: 'libdeflate-src'
       - uses: uraimo/run-on-arch-action@v2.0.5
         with:
@@ -80,7 +80,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
+        ref: 'v1.8'
 #       path: 'libdeflate-src'
     - run: make all check
 
@@ -92,7 +92,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
+        ref: 'v1.8'
 #       path: 'libdeflate-src'
     - shell: bash
       run: |
@@ -107,7 +107,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
+        ref: 'v1.8'
 #       path: 'libdeflate-src'
     - name: Install dependencies
       run: |
