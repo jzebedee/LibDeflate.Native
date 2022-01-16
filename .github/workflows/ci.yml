@@ -5,7 +5,7 @@ env:
   tag: v1.8
 jobs:
   linux-build-and-test:
-    name: Build and test (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matric.compiler }})
+    name: Build and test (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
     strategy:
       matrix:
         os: [ubuntu-latest]
