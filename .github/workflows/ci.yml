@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: '${{ env.CFLAGS }} -march=${{ matrix.arch }}'
+      CFLAGS: -Werror -march=${{ matrix.arch }}
     steps:
     - uses: actions/checkout@v2
       name: Checkout libdeflate
