@@ -96,12 +96,23 @@ jobs:
         repository: 'ebiggers/libdeflate'
         ref: ${{ env.tag }}
     - run: make all check
-    - run: |
-        make -e libdeflate.dylib
+
+    - run: make -e libdeflate.dylib
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-mac-${{ matrix.os }}-${{ matrix.compiler }}
+          name: libdeflate-${{ matrix.os }}-${{ matrix.compiler }}
+          path: libdeflate.dylib
+
+    - run: make -e libdeflate.dylib
+      if: ${{ matrix.os == 'macos-11' }}
+      env:
+        CFLAGS: -target arm64-apple-macos11
+    - name: Upload binaries
+      uses: actions/upload-artifact@v2
+      if: ${{ matrix.os == 'macos-11' }}
+      with:
+          name: libdeflate-${{ matrix.os }}-aarch64-${{ matrix.compiler }}
           path: libdeflate.dylib
   windows-build-and-test:
     name: Build and test (Windows)
