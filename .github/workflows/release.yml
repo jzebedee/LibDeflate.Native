@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 env:
   CFLAGS: -Werror
-
+  tag: v1.8
 jobs:
   x86_64-build-and-test:
     name: Build and test (x86_64, ${{ matrix.os }}, ${{ matrix.compiler }})
@@ -21,13 +21,19 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
-#       path: 'libdeflate-src'
+        ref: ${{ env.tag }}
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind
     - run: scripts/run_tests.sh
+    - run: |
+        make -e libdeflate.so
+    - name: Upload binaries
+      uses: actions/upload-artifact@v2
+      with:
+          name: libdeflate-x86_64-linux-${{ matrix.compiler }}
+          path: libdeflate.so
 
   other-arch-build-and-test:
     name: Build and test (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
@@ -41,8 +47,7 @@ jobs:
         name: Checkout libdeflate
         with:
           repository: 'ebiggers/libdeflate'
-          ref: 'v1.7'
-#         path: 'libdeflate-src'
+          ref: ${{ env.tag }}
       - uses: uraimo/run-on-arch-action@v2.0.5
         with:
           arch: ${{ matrix.arch }}
@@ -83,10 +88,15 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
-#       path: 'libdeflate-src'
+        ref: ${{ env.tag }}
     - run: make all check
-
+    - run: |
+        make -e libdeflate.dylib
+    - name: Upload binaries
+      uses: actions/upload-artifact@v2
+      with:
+          name: libdeflate-macos
+          path: libdeflate.dylib
   windows-build-and-test:
     name: Build and test (Windows)
     runs-on: windows-latest
@@ -95,13 +105,18 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
-#       path: 'libdeflate-src'
+        ref: ${{ env.tag }}
     - shell: bash
       run: |
         PATH="C:\\msys64\\mingw64\\bin:C:\\msys64\\usr\\bin:$PATH" \
           make CC=gcc all check
-
+    - run: |
+        make -e libdeflate.dll
+    - name: Upload binaries
+      uses: actions/upload-artifact@v2
+      with:
+          name: libdeflate-w64
+          path: libdeflate.dll
   cross-compile-for-windows:
     name: Cross compile for Windows
     runs-on: ubuntu-latest
@@ -110,13 +125,22 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: 'v1.7'
-#       path: 'libdeflate-src'
+        ref: ${{ env.tag }}
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 libz-mingw-w64-dev
     - name: 32-bit build
-      run: make CC=i686-w64-mingw32-gcc all test_programs
+      run: make CC=i686-w64-mingw32-gcc -e libdeflate.dll
+    - name: Upload 32-bit binaries
+      uses: actions/upload-artifact@v2
+      with:
+          name: libdeflate-w32
+          path: libdeflate.dll
     - name: 64-bit build
-      run: make CC=x86_64-w64-mingw32-gcc all test_programs
+      run: make CC=x86_64-w64-mingw32-gcc -e libdeflate.dll
+    - name: Upload 64-bit binaries
+      uses: actions/upload-artifact@v2
+      with:
+          name: libdeflate-w64
+          path: libdeflate.dll

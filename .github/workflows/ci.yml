@@ -76,8 +76,8 @@ jobs:
 
             export CC=${{ matrix.compiler }}
             scripts/run_tests.sh
-      - run: |
-          make -e libdeflate.so
+            
+            make -e libdeflate.so
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
