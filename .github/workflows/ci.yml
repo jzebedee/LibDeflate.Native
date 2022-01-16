@@ -84,8 +84,11 @@ jobs:
             name: libdeflate-${{ matrix.arch }}-${{ matrix.compiler }}
             path: libdeflate.so
   macos-build-and-test:
-    name: Build and test (macOS)
-    runs-on: macos-latest
+    name: Build and test (macOS, ${{ matrix.os }}, ${{ matrix.compiler }})
+    strategy:
+      matrix:
+        os: [macos-11,macos-10.15]
+        compiler: [gcc]
     steps:
     - uses: actions/checkout@v2
       name: Checkout libdeflate
@@ -98,7 +101,7 @@ jobs:
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-macos
+          name: libdeflate-mac-${{ matrix.os }}-${{ matrix.compiler }}
           path: libdeflate.dylib
   windows-build-and-test:
     name: Build and test (Windows)
