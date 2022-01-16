@@ -4,15 +4,17 @@ env:
   CFLAGS: -Werror
   tag: v1.8
 jobs:
-  x86_64-build-and-test:
-    name: Build and test (x86_64, ${{ matrix.os }}, ${{ matrix.compiler }})
+  linux-build-and-test:
+    name: Build and test (linux:{{ matrix.os }}, {{ matrix.arch }}, {{ matric.compiler }})
     strategy:
       matrix:
         os: [ubuntu-latest]
         compiler: [gcc]
+        arch: [x86-64,i686]
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
+      CFLAGS: '{{ env.CFLAGS }} -march={{ matrix.arch }}'
     steps:
     - uses: actions/checkout@v2
       name: Checkout libdeflate
@@ -23,15 +25,15 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind
-    - run: scripts/run_tests.sh
-    - run: |
-        make -e libdeflate.so
+    - name: Run tests
+      run: scripts/run_tests.sh
+    - name: Build libdeflate
+      run: make -e libdeflate.so
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-x86_64-linux-${{ matrix.compiler }}
+          name: libdeflate-linux-{{ matrix.arch }}
           path: libdeflate.so
-
   other-arch-build-and-test:
     name: Build and test (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
@@ -132,8 +134,7 @@ jobs:
       run: |
         PATH="C:\\msys64\\mingw64\\bin:C:\\msys64\\usr\\bin:$PATH" \
           make CC=gcc all check
-    - run: |
-        make -e libdeflate.dll
+    - run: make -e libdeflate.dll
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
