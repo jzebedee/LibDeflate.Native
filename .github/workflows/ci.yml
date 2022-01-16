@@ -84,11 +84,7 @@ jobs:
             name: libdeflate-${{ matrix.arch }}-${{ matrix.compiler }}
             path: libdeflate.so
   macos-build-and-test:
-    name: Build and test (macOS, ${{ matrix.os }}, ${{ matrix.compiler }})
-    strategy:
-      matrix:
-        os: [macos-11,macos-10.15]
-        compiler: [gcc]
+    name: Build and test (macOS, x86_64)
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -102,18 +98,26 @@ jobs:
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-${{ matrix.os }}-${{ matrix.compiler }}
+          name: libdeflate-macos-gcc
           path: libdeflate.dylib
+  macos-aarch64-build-and-test:
+    name: Build and test (macOS, aarch64)
+    runs-on: macos-11
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout libdeflate
+      with:
+        repository: 'ebiggers/libdeflate'
+        ref: ${{ env.tag }}
+    - run: make all check
 
     - run: make -e libdeflate.dylib
-      if: ${{ matrix.os == 'macos-11' }}
       env:
         CFLAGS: -target arm64-apple-macos11
     - name: Upload binaries
       uses: actions/upload-artifact@v2
-      if: ${{ matrix.os == 'macos-11' }}
       with:
-          name: libdeflate-${{ matrix.os }}-aarch64-${{ matrix.compiler }}
+          name: libdeflate-macos-11-aarch64-gcc
           path: libdeflate.dylib
   windows-build-and-test:
     name: Build and test (Windows)
