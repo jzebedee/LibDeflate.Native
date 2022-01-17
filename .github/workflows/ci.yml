@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         compiler: [gcc]
-        arch: [x86-64,i686 -m32]
+        arch: [x86-64,i686 -m32 -fno-pic]
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
