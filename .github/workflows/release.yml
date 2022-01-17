@@ -7,8 +7,8 @@ env:
   CFLAGS: -Werror
   tag: v1.8
 jobs:
-  linux-build-and-test:
-    name: Build and test (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
+  linux-build:
+    name: Build (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -29,8 +29,6 @@ jobs:
         sudo dpkg --add-architecture i386
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib lib32z1-dev libc6-dbg:i386
-    - name: Run tests
-      run: scripts/run_tests.sh
     - name: Build libdeflate
       run: make -e libdeflate.so
     - name: Upload binaries
@@ -38,7 +36,7 @@ jobs:
       with:
           name: libdeflate-linux-${{ matrix.arch }}
           path: libdeflate.so
-  other-arch-build-and-test:
+  other-arch-build:
     name: Build and test (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
       matrix:
@@ -59,37 +57,13 @@ jobs:
           install: |
             apt-get update
             apt-get install -y build-essential clang llvm libz-dev valgrind
-          run: |
-            # Valgrind and ASAN crash on at least s390x, ppc64le, and aarch64
-            # here.  (It's probably something related to the QEMU user-mode
-            # emulation that run-on-arch-action uses.)
-            export SKIP_VALGRIND=1
-            export SKIP_ASAN=1
-
-            case ${{ matrix.arch }} in
-            s390x)
-              # On s390x, in freestanding builds the shared library links to an
-              # external symbol __clzdi2, even when -static-libgcc is used.
-              export SKIP_FREESTANDING=1
-              ;;
-            aarch64)
-              # "ldd: exited with unknown exit code (139)"
-              if [ ${{ matrix.compiler }} = clang ]; then
-                export SKIP_SHARED_LIB=1
-              fi
-              ;;
-            esac
-
-            export CC=${{ matrix.compiler }}
-            scripts/run_tests.sh
-            
-            make -e libdeflate.so
+          run: make CC=${{ matrix.compiler }} -e libdeflate.so
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
             name: libdeflate-${{ matrix.arch }}-${{ matrix.compiler }}
             path: libdeflate.so
-  macos-build-and-test:
+  macos-build:
     name: Build and test (macOS, x86_64)
     runs-on: macos-latest
     steps:
@@ -98,15 +72,13 @@ jobs:
       with:
         repository: 'ebiggers/libdeflate'
         ref: ${{ env.tag }}
-    - run: make all check
-
     - run: make -e libdeflate.dylib
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
           name: libdeflate-macos-gcc
           path: libdeflate.dylib
-  macos-aarch64-build-and-test:
+  macos-aarch64-build:
     name: Build and test (macOS, aarch64)
     runs-on: macos-11
     steps:
@@ -115,8 +87,6 @@ jobs:
       with:
         repository: 'ebiggers/libdeflate'
         ref: ${{ env.tag }}
-    - run: make all check
-
     - run: make -e libdeflate.dylib
       env:
         CFLAGS: -target arm64-apple-macos11
@@ -125,25 +95,6 @@ jobs:
       with:
           name: libdeflate-macos-11-aarch64-gcc
           path: libdeflate.dylib
-  windows-build-and-test:
-    name: Build and test (Windows)
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-      name: Checkout libdeflate
-      with:
-        repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
-    - shell: bash
-      run: |
-        PATH="C:\\msys64\\mingw64\\bin:C:\\msys64\\usr\\bin:$PATH" \
-          make CC=gcc all check
-    - run: make -e libdeflate.dll
-    - name: Upload binaries
-      uses: actions/upload-artifact@v2
-      with:
-          name: libdeflate-w64
-          path: libdeflate.dll
   cross-compile-for-windows:
     name: Cross compile for Windows
     runs-on: ubuntu-latest
