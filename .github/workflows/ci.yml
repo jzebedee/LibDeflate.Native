@@ -10,7 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         compiler: [gcc]
-        arch: [x86-64,i686]
+        arch: [x86-64,i686 -m32]
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y clang llvm libz-dev valgrind
+        sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib
     - name: Run tests
       run: scripts/run_tests.sh
     - name: Build libdeflate
