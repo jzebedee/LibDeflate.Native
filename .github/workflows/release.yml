@@ -31,10 +31,10 @@ jobs:
       run: |
         case ${{ matrix.arch }} in
           x64)
-            echo "CFLAGS=${{ env.CFLAGS }} -march x86-64" >> $GITHUB_ENV
+            echo "CFLAGS=${{ env.CFLAGS }} -march=x86-64" >> $GITHUB_ENV
             ;;
           x86)
-            echo "CFLAGS=${{ env.CFLAGS }} -march i686 -m32 -fno-pic" >> $GITHUB_ENV
+            echo "CFLAGS=${{ env.CFLAGS }} -march=i686 -m32 -fno-pic" >> $GITHUB_ENV
             ;;
         esac
     - name: Build libdeflate
