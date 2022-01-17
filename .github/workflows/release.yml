@@ -48,7 +48,7 @@ jobs:
     name: Build (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
       matrix:
-        arch: [armv6, armv7, aarch64]
+        rid: [arm, arm64]
         compiler: [gcc]
     runs-on: ubuntu-latest
     steps:
@@ -57,9 +57,19 @@ jobs:
         with:
           repository: 'ebiggers/libdeflate'
           ref: ${{ env.tag }}
+      - name: Set arch options
+        run: |
+          case ${{ matrix.rid }} in
+            arm)
+              echo "arch=armv7" >> $GITHUB_ENV
+              ;;
+            arm64)
+              echo "arch=aarch64" >> $GITHUB_ENV
+              ;;
+          esac
       - uses: uraimo/run-on-arch-action@v2.0.5
         with:
-          arch: ${{ matrix.arch }}
+          arch: ${{ env.arch }}
           distro: buster
           githubToken: ${{ github.token }}
           install: |
@@ -69,7 +79,7 @@ jobs:
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
-            name: libdeflate-${{ matrix.arch }}-${{ matrix.compiler }}
+            name: linux-${{ matrix.rid }}
             path: libdeflate.so
   macos-build:
     name: Build (macOS, x86_64)
