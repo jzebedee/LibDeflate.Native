@@ -45,7 +45,7 @@ jobs:
           name: linux-${{ matrix.arch }}
           path: libdeflate.so
   other-arch-build:
-    name: Build (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
+    name: Build (${{ matrix.rid }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
       matrix:
         rid: [arm, arm64]
