@@ -23,8 +23,9 @@ jobs:
         ref: ${{ env.tag }}
     - name: Install dependencies
       run: |
+        sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib lib32z1-dev libc6-dbg-x32-cross 
+        sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib lib32z1-dev libc6-dbg:i386
     - name: Run tests
       run: scripts/run_tests.sh
     - name: Build libdeflate
