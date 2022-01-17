@@ -27,18 +27,18 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib
-    - name: Build libdeflate
+    - name: Set arch options
       run: |
         case ${{ matrix.arch }} in
           x64)
-            CFLAGS = "$CFLAGS -march x86-64"
+            echo "CFLAGS={{ env.CFLAGS }} -march x86-64" >> $GITHUB_ENV
             ;;
           x86)
-            CFLAGS = "$CFLAGS -march i686 -m32 -fno-pic"
+            echo "CFLAGS={{ env.CFLAGS }} -march i686 -m32 -fno-pic" >> $GITHUB_ENV
             ;;
         esac
-
-        make -e libdeflate.so
+    - name: Build libdeflate
+      run: make -e libdeflate.so
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
