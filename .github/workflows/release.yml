@@ -13,11 +13,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         compiler: [gcc]
-        arch: [x86-64,i686 -m32 -fno-pic]
+        arch: [x64,x86]
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
-      CFLAGS: -Werror -march=${{ matrix.arch }}
     steps:
     - uses: actions/checkout@v2
       name: Checkout libdeflate
@@ -26,18 +25,27 @@ jobs:
         ref: ${{ env.tag }}
     - name: Install dependencies
       run: |
-        sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib lib32z1-dev libc6-dbg:i386
+        sudo apt-get install -y clang llvm libz-dev valgrind gcc-multilib
     - name: Build libdeflate
-      run: make -e libdeflate.so
+      run: |
+        case ${{ matrix.arch }} in
+          x64)
+            CFLAGS = "$CFLAGS -march x86-64"
+            ;;
+          x86)
+            CFLAGS = "$CFLAGS -march i686 -m32 -fno-pic"
+            ;;
+        esac
+
+        make -e libdeflate.so
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-linux-${{ matrix.arch }}
+          name: linux-${{ matrix.arch }}
           path: libdeflate.so
   other-arch-build:
-    name: Build and test (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
+    name: Build (${{ matrix.arch }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
       matrix:
         arch: [armv6, armv7, aarch64]
@@ -64,7 +72,7 @@ jobs:
             name: libdeflate-${{ matrix.arch }}-${{ matrix.compiler }}
             path: libdeflate.so
   macos-build:
-    name: Build and test (macOS, x86_64)
+    name: Build (macOS, x86_64)
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -76,10 +84,10 @@ jobs:
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-macos-gcc
+          name: osx-x64
           path: libdeflate.dylib
   macos-aarch64-build:
-    name: Build and test (macOS, aarch64)
+    name: Build (macOS, aarch64)
     runs-on: macos-11
     steps:
     - uses: actions/checkout@v2
@@ -93,7 +101,7 @@ jobs:
     - name: Upload binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-macos-11-aarch64-gcc
+          name: osx.11.0-arm64
           path: libdeflate.dylib
   cross-compile-for-windows:
     name: Cross compile for Windows
@@ -113,12 +121,12 @@ jobs:
     - name: Upload 32-bit binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-w32
+          name: win-x86
           path: libdeflate.dll
     - name: 64-bit build
       run: make CC=x86_64-w64-mingw32-gcc -e libdeflate.dll
     - name: Upload 64-bit binaries
       uses: actions/upload-artifact@v2
       with:
-          name: libdeflate-w64
+          name: win-x64
           path: libdeflate.dll
