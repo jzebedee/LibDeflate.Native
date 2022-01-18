@@ -2,11 +2,11 @@
 <package>
   <metadata>
     <id>LibDeflate.Native</id>
-    <version>1.7.1</version>
+    <version>1.8.0</version>
     <authors>jzebedee</authors>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/jzebedee/LibDeflate.Native</projectUrl>
     <description>LibDeflate.NET dependency containing all supported native binaries of libdeflate</description>
-    <tags>native libdeflate libdeflate.net deflate zlib gzip gz</tags>
+    <tags>libdeflate libdeflate.net deflate zlib gzip gz</tags>
   </metadata>
 </package>
