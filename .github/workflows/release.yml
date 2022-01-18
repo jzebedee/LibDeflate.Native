@@ -7,6 +7,25 @@ env:
   CFLAGS: -Werror
   tag: v1.8
 jobs:
+  pack-release:
+    name: Package build artifacts
+    runs-on: ubuntu-latest
+    needs: [linux_build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Pack
+        run: dotnet pack -c Release --output pkg
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: LibDeflate.Native
+          path: pkg/*
+
   linux-build:
     name: Build (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
     strategy:
@@ -44,7 +63,7 @@ jobs:
       with:
           name: linux-${{ matrix.arch }}
           path: libdeflate.so
-  other-arch-build:
+  arm-build:
     name: Build (${{ matrix.rid }}, Debian Buster, ${{ matrix.compiler }})
     strategy:
       matrix:
@@ -113,8 +132,8 @@ jobs:
       with:
           name: osx.11.0-arm64
           path: libdeflate.dylib
-  cross-compile-for-windows:
-    name: Cross compile for Windows
+  win-cross-build:
+    name: Build (Windows, cross-compile, x86/64, MinGW gcc)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
