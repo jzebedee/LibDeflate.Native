@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>LibDeflate.Native</PackageId>
+    <Version>1.8.0</Version>
+    <Authors>jzebedee</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/jzebedee/LibDeflate.Native</PackageProjectUrl>
+    <Description>LibDeflate.NET dependency containing all supported native binaries of libdeflate</Description>
+    <PackageTags>libdeflate libdeflate.net deflate zlib gzip gz</PackageTags>
+  </PropertyGroup>
+</Project>
