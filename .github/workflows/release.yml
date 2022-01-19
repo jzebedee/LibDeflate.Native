@@ -31,11 +31,15 @@ jobs:
           done
       - name: Pack
         run: dotnet pack -c Release -o pkg
-      - name: Upload binaries
+      - name: Upload package
         uses: actions/upload-artifact@v2
         with:
           name: LibDeflate.Native
           path: pkg/*
+      - name: Publish the package to GPR
+        run: dotnet nuget push pkg/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/jzebedee/index.json --skip-duplicate
+      - name: Publish the package to NuGet
+        run: dotnet nuget push pkg/*.nupkg -k ${{ secrets.LIBDEFLATE_NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
   linux-build:
     name: Build (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
