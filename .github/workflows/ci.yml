@@ -2,7 +2,7 @@ name: CI
 on: [pull_request]
 env:
   CFLAGS: -Werror
-  tag: v1.8
+  tag: v1.9
 jobs:
   linux-build-and-test:
     name: Build and test (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
