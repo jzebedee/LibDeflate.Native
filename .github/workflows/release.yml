@@ -20,11 +20,9 @@ jobs:
           dotnet-version: '6.0.x'
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v2
-          path: built-runtimes
+          path: packages-contents/runtimes/
       - name: Setup package folder structure
         run: |
-          mkdir packages-contents/runtimes/
-          mv built-runtimes/* packages-contents/runtimes/
           cd packages-contents/runtimes
           for d in */ ; do
             mkdir ${d}native ;
