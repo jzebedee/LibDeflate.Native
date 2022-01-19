@@ -1,56 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets#packing-using-a-nuspec-file -->
   <PropertyGroup>
-    <TargetFramework></TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoBuild>true</NoBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-
-    <PackageId>LibDeflate.Native</PackageId>
-    <Version>1.8.0</Version>
-    <Authors>jzebedee</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/jzebedee/LibDeflate.Native</PackageProjectUrl>
-    <Description>LibDeflate.NET dependency containing all supported native binaries of libdeflate</Description>
-    <PackageTags>libdeflate libdeflate.net deflate zlib gzip gz</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="linux-x64\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\linux-x64\</PackagePath>
-    </Content>
-    <Content Include="linux-x86\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\linux-x86\</PackagePath>
-    </Content>
-    <Content Include="linux-arm\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\linux-arm\</PackagePath>
-    </Content>
-    <Content Include="linux-arm64\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\linux-arm64\</PackagePath>
-    </Content>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="win-x64\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\win-x64\</PackagePath>
-    </Content>
-    <Content Include="win-x86\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\win-x86\</PackagePath>
-    </Content>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="osx-x64\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\osx-x64\</PackagePath>
-    </Content>
-    <Content Include="osx.11.0-arm64\*">
-      <Pack>true</Pack>
-      <PackagePath>runtimes\native\osx.11.0-arm64\</PackagePath>
-    </Content>
-  </ItemGroup>
-  
+  <PropertyGroup>
+    <NuspecFile>LibDeflate.Native.nuspec</NuspecFile>
+    <NuspecProperties></NuspecProperties>
+    <NuspecBasePath>package-contents</NuspecBasePath>
+  </PropertyGroup>
 </Project>

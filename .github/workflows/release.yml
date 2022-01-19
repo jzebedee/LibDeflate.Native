@@ -12,14 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     needs: [linux_build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
     steps:
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install dotnet
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+          path: built-runtimes
+      - name: Setup package folder structure
+        run: |
+          mkdir packages-contents/runtimes/
+          mv built-runtimes/* packages-contents/runtimes/
+          cd packages-contents/runtimes
+          for d in */ ; do
+            mkdir ${d}native ;
+            mv ${d}libdeflate* ${d}native/ ;
+          done
       - name: Pack
-        run: dotnet pack -c Release --output pkg
+        run: dotnet pack -c Release -o pkg
       - name: Upload binaries
         uses: actions/upload-artifact@v2
         with:
