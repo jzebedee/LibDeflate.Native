@@ -7,36 +7,6 @@ env:
   CFLAGS: -Werror
   tag: v1.8
 jobs:
-  pack-release:
-    name: Package build artifacts
-    runs-on: ubuntu-latest
-    needs: [linux_build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Install dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '6.0.x'
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
-        with:
-          path: packages-contents/runtimes
-      - name: Setup package folder structure
-        run: |
-          cd packages-contents/runtimes
-          for d in */ ; do
-            mkdir ${d}native ;
-            mv ${d}libdeflate* ${d}native/ ;
-          done
-      - name: Pack
-        run: dotnet pack -c Release -o pkg
-      - name: Upload binaries
-        uses: actions/upload-artifact@v2
-        with:
-          name: LibDeflate.Native
-          path: pkg/*
-
   linux-build:
     name: Build (linux:${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.compiler }})
     strategy:
@@ -170,3 +140,33 @@ jobs:
       with:
           name: win-x64
           path: libdeflate.dll
+  
+  pack-release:
+    name: Package build artifacts
+    runs-on: ubuntu-latest
+    needs: [linux_build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: packages-contents/runtimes
+      - name: Setup package folder structure
+        run: |
+          cd packages-contents/runtimes
+          for d in */ ; do
+            mkdir ${d}native ;
+            mv ${d}libdeflate* ${d}native/ ;
+          done
+      - name: Pack
+        run: dotnet pack -c Release -o pkg
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: LibDeflate.Native
+          path: pkg/*
