@@ -20,6 +20,7 @@ jobs:
           dotnet-version: '6.0.x'
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v2
+        with:
           path: packages-contents/runtimes
       - name: Setup package folder structure
         run: |
