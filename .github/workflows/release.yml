@@ -8,7 +8,7 @@ env:
   tag: v1.8
 jobs:
   pack-release:
-    name: Package build artifacts
+    name: Package and publish build artifacts
     runs-on: ubuntu-latest
     needs: [linux-build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
     steps:
