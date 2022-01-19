@@ -21,10 +21,10 @@ jobs:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v2
         with:
-          path: packages-contents/runtimes
+          path: package-contents/runtimes
       - name: Setup package folder structure
         run: |
-          cd packages-contents/runtimes
+          cd package-contents/runtimes
           for d in */ ; do
             mkdir ${d}native ;
             mv ${d}libdeflate* ${d}native/ ;
