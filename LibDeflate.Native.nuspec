@@ -8,5 +8,6 @@
     <projectUrl>https://github.com/jzebedee/LibDeflate.Native</projectUrl>
     <description>LibDeflate.NET dependency containing all supported native binaries of libdeflate</description>
     <tags>libdeflate libdeflate.net deflate zlib gzip gz</tags>
+    <repository type="git" url="https://github.com/jzebedee/LibDeflate.Native.git" />
   </metadata>
 </package>
