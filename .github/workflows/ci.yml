@@ -1,5 +1,5 @@
 name: CI
-on: [pull_request]
+on: [pull_request, workflow_dispatch]
 env:
   tag: v1.17
 jobs:
@@ -35,10 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      name: Checkout libdeflate
-      with:
-        repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        name: Checkout libdeflate
+        with:
+          repository: 'ebiggers/libdeflate'
+          ref: ${{ env.tag }}
       - uses: uraimo/run-on-arch-action@v2.2.0
         with:
           arch: ${{ matrix.arch }}
