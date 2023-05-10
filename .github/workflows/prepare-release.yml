@@ -1,7 +1,10 @@
-name: CI
-on: [pull_request, workflow_dispatch]
-env:
-  tag: v1.18
+name: Prepare Release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        type: string
 jobs:
   x86_64-build-and-test:
     name: Build and test (x86_64, ${{ matrix.os }}, ${{ matrix.compiler }})
@@ -17,7 +20,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        ref: ${{ github.event.inputs.tag }}
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -38,7 +41,7 @@ jobs:
         name: Checkout libdeflate
         with:
           repository: 'ebiggers/libdeflate'
-          ref: ${{ env.tag }}
+          ref: ${{ github.event.inputs.tag }}
       - uses: uraimo/run-on-arch-action@v2.5.0
         with:
           arch: ${{ matrix.arch }}
@@ -64,7 +67,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        ref: ${{ github.event.inputs.tag }}
     - run: cmake -B build -DLIBDEFLATE_BUILD_TESTS=1
     - run: cmake --build build --verbose
     - run: DESTDIR=build/install cmake --install build --verbose
@@ -90,7 +93,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        ref: ${{ github.event.inputs.tag }}
     - uses: msys2/setup-msys2@v2
       with:
         msystem: ${{matrix.sys}}
@@ -119,7 +122,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        ref: ${{ github.event.inputs.tag }}
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -153,7 +156,7 @@ jobs:
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
-        ref: ${{ env.tag }}
+        ref: ${{ github.event.inputs.tag }}
     - run: |
         scripts/cmake-helper.sh \
             -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME"/build/cmake/android.toolchain.cmake \
