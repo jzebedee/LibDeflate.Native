@@ -1,11 +1,11 @@
-name: Release
+name: Publish Release
 on:
   release:
-    types: [created]
+    types: [published, edited]
   workflow_dispatch:
 env:
   CFLAGS: -Werror
-  tag: v1.9
+  tag: v1.18
 jobs:
   pack-release:
     name: Package and publish build artifacts
@@ -13,9 +13,9 @@ jobs:
     needs: [linux-build, arm-build, macos-build, macos-aarch64-build, win-cross-build]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
       - name: Download all workflow run artifacts
@@ -118,15 +118,22 @@ jobs:
   macos-build:
     name: Build (macOS, x86_64)
     runs-on: macos-latest
+    env:
+      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
         ref: ${{ env.tag }}
-    - run: make -e libdeflate.dylib
+    - run: cmake -B build -DLIBDEFLATE_BUILD_TESTS=1
+    - run: cmake --build build --verbose
+    - run: DESTDIR=build/install cmake --install build --verbose
+    - run: ctest --test-dir build
+    - name: Direct compilation without official build system
+      run: cc -O2 -Wall -Werror lib/*{,/*}.c programs/{gzip,prog_util,tgetopt}.c -o libdeflate-gzip
     - name: Upload binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
           name: osx-x64
           path: libdeflate.dylib
@@ -150,8 +157,10 @@ jobs:
   win-cross-build:
     name: Build (Windows, cross-compile, x86/64, MinGW gcc)
     runs-on: ubuntu-latest
+    env:
+      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       name: Checkout libdeflate
       with:
         repository: 'ebiggers/libdeflate'
@@ -160,17 +169,51 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 libz-mingw-w64-dev
+    # Unfortunately Ubuntu doesn't have {i686,x86_64}-w64-mingw32-cmake like
+    # some distros have, so we have to provide our own toolchain files here.
     - name: 32-bit build
-      run: make CC=i686-w64-mingw32-gcc -e libdeflate.dll
+      run: |
+        scripts/cmake-helper.sh -DLIBDEFLATE_BUILD_TESTS=1 \
+            -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-i686-w64-mingw32.cmake
+        cmake --build build --verbose
+        DESTDIR=build/install cmake --install build --verbose
     - name: Upload 32-bit binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
           name: win-x86
           path: libdeflate.dll
     - name: 64-bit build
-      run: make CC=x86_64-w64-mingw32-gcc -e libdeflate.dll
+      run: |
+        scripts/cmake-helper.sh -DLIBDEFLATE_BUILD_TESTS=1 \
+            -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-x86_64-w64-mingw32.cmake
+        cmake --build build --verbose
+        DESTDIR=build/install cmake --install build --verbose
     - name: Upload 64-bit binaries
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
           name: win-x64
           path: libdeflate.dll
+
+  cross-compile-for-android:
+    name: Cross compile for ${{matrix.abi}} Android on ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        abi: [armeabi-v7a, arm64-v8a, x86, x86_64]
+    runs-on: ${{matrix.os}}
+    env:
+      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout libdeflate
+      with:
+        repository: 'ebiggers/libdeflate'
+        ref: ${{ env.tag }}
+    - run: |
+        scripts/cmake-helper.sh \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME"/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=${{matrix.abi}} \
+            -DANDROID_PLATFORM=28 \
+            -DLIBDEFLATE_BUILD_TESTS=1
+        cmake --build build --verbose
+        DESTDIR=build/install cmake --install build --verbose
