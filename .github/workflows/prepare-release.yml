@@ -26,8 +26,19 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y clang llvm libz-dev valgrind
     - run: scripts/run_tests.sh
-    - name: Direct compilation without official build system
-      run: $CC -O2 -Wall -Werror lib/*{,/*}.c programs/{gzip,prog_util,tgetopt}.c -o libdeflate-gzip
+    - name: Build lib
+      run: |
+        cmake -B build \
+          -DLIBDEFLATE_BUILD_SHARED_LIB=1 \
+          -DLIBDEFLATE_COMPRESSION_SUPPORT=1 \
+          -DLIBDEFLATE_DECOMPRESSION_SUPPORT=1 \
+          -DLIBDEFLATE_ZLIB_SUPPORT=1 \
+          -DLIBDEFLATE_GZIP_SUPPORT=1
+        cmake --build build
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'x86_64_${{ matrix.os }}_${{ matrix.compiler }}'
+        path: build/libdeflate.s0
 
   other-arch-build-and-test:
     name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
