@@ -6,12 +6,12 @@ on:
         required: true
         type: string
 jobs:
-  x86_64-build-and-test:
-    name: Build and test (x86_64, ${{ matrix.os }}, ${{ matrix.compiler }})
+  linux-x64-build:
+    name: Build (linux-x64, ${{ matrix.os }}, ${{ matrix.compiler }})
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
-        compiler: [gcc, clang]
+        os: [ubuntu-latest]
+        compiler: [gcc]
     runs-on: ${{ matrix.os }}
     env:
       CC: ${{ matrix.compiler }}
@@ -37,7 +37,7 @@ jobs:
         cmake --build build
     - uses: actions/upload-artifact@v2
       with:
-        name: 'x86_64-${{ matrix.os }}-${{ matrix.compiler }}'
+        name: 'linux-x64'
         path: build/libdeflate.so
 
   other-arch-build-and-test:
@@ -94,7 +94,7 @@ jobs:
         cmake --build build
     - uses: actions/upload-artifact@v2
       with:
-        name: 'macos'
+        name: 'osx-x64'
         path: build/libdeflate.dylib
 
   windows-msys2-build-and-test:
@@ -157,12 +157,20 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-i686-w64-mingw32.cmake
         cmake --build build --verbose
         DESTDIR=build/install cmake --install build --verbose
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'win-x86'
+        path: build/libdeflate.dll
     - name: 64-bit build
       run: |
         scripts/cmake-helper.sh -DLIBDEFLATE_BUILD_TESTS=1 \
             -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-x86_64-w64-mingw32.cmake
         cmake --build build --verbose
         DESTDIR=build/install cmake --install build --verbose
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'win-x64'
+        path: build/libdeflate.dll
 
   cross-compile-for-android:
     name: Cross compile for ${{matrix.abi}} Android on ${{matrix.os}}
