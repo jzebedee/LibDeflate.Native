@@ -6,7 +6,7 @@ on:
         required: true
         type: string
 jobs:
-  linux-x64-build:
+  linux-x64-build-and-test:
     name: Build and test (linux-x64, ${{ matrix.os }}, ${{ matrix.compiler }})
     strategy:
       matrix:
@@ -39,8 +39,9 @@ jobs:
       with:
         name: 'linux-x64'
         path: build/libdeflate.so
+        if-no-files-found: error
 
-  other-arch-build-and-test:
+  linux-armX-build-and-test:
     name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
     strategy:
       matrix:
@@ -98,6 +99,7 @@ jobs:
         with:
           name: 'linux-${{ env.rid }}'
           path: ${PWD}/artifacts/libdeflate.so
+          if-no-files-found: error
 
   macos-build-and-test:
     name: Build and test (macOS, ${{ matrix.os }})
@@ -132,6 +134,7 @@ jobs:
       with:
         name: 'osx.11.0'
         path: build/libdeflate.dylib
+        if-no-files-found: error
 
   # windows-msys2-build-and-test:
   #   name: Build and test (Windows, MSYS2, ${{matrix.sys}})
@@ -197,6 +200,7 @@ jobs:
       with:
         name: 'win-x86'
         path: build/libdeflate.dll
+        if-no-files-found: error
     - name: 64-bit build
       run: |
         scripts/cmake-helper.sh -DLIBDEFLATE_BUILD_TESTS=1 \
@@ -207,6 +211,7 @@ jobs:
       with:
         name: 'win-x64'
         path: build/libdeflate.dll
+        if-no-files-found: error
 
   # cross-compile-for-android:
   #   name: Cross compile for ${{matrix.abi}} Android on ${{matrix.os}}
