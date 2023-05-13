@@ -6,6 +6,10 @@ This package is a [LibDeflate.NET](https://github.com/jzebedee/LibDeflate.NET) d
 
 LibDeflate.Native contains prebuilt binaries on the following platforms:
 
-- `win-x64`, `win-x86`
+- `win-x64`
+- `win-x86`
 - `linux-x64`
-- `osx.11.0-x64`, `osx.11.0-arm64`, `osx.10.15-x64`, `osx.10.14-x64`, `osx.10.13-x64`
+- `linux-armv6`
+- `linux-arm`
+- `linux-arm64`
+- `osx-11.0` (Universal binary, supports both `osx.11.0-x64` and `osx.11.0-arm64`)
