@@ -7,7 +7,7 @@ on:
         type: string
 jobs:
   linux-x64-build:
-    name: Build (linux-x64, ${{ matrix.os }}, ${{ matrix.compiler }})
+    name: Build and test (linux-x64, ${{ matrix.os }}, ${{ matrix.compiler }})
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -69,10 +69,14 @@ jobs:
             CC=${{matrix.compiler}} scripts/run_tests.sh "${tests[@]}"
 
   macos-build-and-test:
-    name: Build and test (macOS)
-    runs-on: macos-latest
+    name: Build and test (macOS, ${{ matrix.os }}, ${{ matrix.target }})
+    strategy:
+      matrix:
+        os: [macos-11]
+        target: [x86_64-apple-macos11,arm64-apple-macos11]
+    runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
+      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS -target ${{ matrix.target }}
     steps:
     - uses: actions/checkout@v3
       name: Checkout libdeflate
