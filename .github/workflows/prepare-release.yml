@@ -69,14 +69,14 @@ jobs:
             CC=${{matrix.compiler}} scripts/run_tests.sh "${tests[@]}"
 
   macos-build-and-test:
-    name: Build and test (macOS, ${{ matrix.os }}, ${{ matrix.target }})
+    name: Build and test (macOS, ${{ matrix.os }})
     strategy:
       matrix:
         os: [macos-11]
-        target: [x86_64-apple-macos11,arm64-apple-macos11]
     runs-on: ${{ matrix.os }}
     env:
-      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS -target ${{ matrix.target }}
+      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
+      CMAKE_OSX_ARCHITECTURES: arm64;x86_64
     steps:
     - uses: actions/checkout@v3
       name: Checkout libdeflate
@@ -98,7 +98,7 @@ jobs:
         cmake --build build
     - uses: actions/upload-artifact@v2
       with:
-        name: 'osx-x64'
+        name: 'osx.11.0'
         path: build/libdeflate.dylib
 
   windows-msys2-build-and-test:
