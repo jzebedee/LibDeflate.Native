@@ -98,7 +98,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: 'linux-${{ env.rid }}'
-          path: ${PWD}/artifacts/libdeflate.so
+          path: artifacts/libdeflate.so
           if-no-files-found: error
 
   macos-build-and-test:
