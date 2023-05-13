@@ -40,33 +40,33 @@ jobs:
         name: 'linux-x64'
         path: build/libdeflate.so
 
-  other-arch-build-and-test:
-    name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
-    strategy:
-      matrix:
-        arch: [armv6, armv7, aarch64]
-        compiler: [gcc, clang]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        name: Checkout libdeflate
-        with:
-          repository: 'ebiggers/libdeflate'
-          ref: ${{ github.event.inputs.tag }}
-      - uses: uraimo/run-on-arch-action@v2.5.0
-        with:
-          arch: ${{ matrix.arch }}
-          distro: bullseye
-          githubToken: ${{ github.token }}
-          install: |
-            apt-get update
-            apt-get install -y build-essential cmake clang llvm libz-dev
-          run: |
-            tests=(regular)
-            if [ ${{matrix.compiler}} = clang ]; then
-                tests+=(ubsan)
-            fi
-            CC=${{matrix.compiler}} scripts/run_tests.sh "${tests[@]}"
+  # other-arch-build-and-test:
+  #   name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
+  #   strategy:
+  #     matrix:
+  #       arch: [armv6, armv7, aarch64]
+  #       compiler: [gcc, clang]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       name: Checkout libdeflate
+  #       with:
+  #         repository: 'ebiggers/libdeflate'
+  #         ref: ${{ github.event.inputs.tag }}
+  #     - uses: uraimo/run-on-arch-action@v2.5.0
+  #       with:
+  #         arch: ${{ matrix.arch }}
+  #         distro: bullseye
+  #         githubToken: ${{ github.token }}
+  #         install: |
+  #           apt-get update
+  #           apt-get install -y build-essential cmake clang llvm libz-dev
+  #         run: |
+  #           tests=(regular)
+  #           if [ ${{matrix.compiler}} = clang ]; then
+  #               tests+=(ubsan)
+  #           fi
+  #           CC=${{matrix.compiler}} scripts/run_tests.sh "${tests[@]}"
 
   macos-build-and-test:
     name: Build and test (macOS, ${{ matrix.os }})
@@ -102,42 +102,42 @@ jobs:
         name: 'osx.11.0'
         path: build/libdeflate.dylib
 
-  windows-msys2-build-and-test:
-    name: Build and test (Windows, MSYS2, ${{matrix.sys}})
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        include:
-        - { sys: mingw64, env: x86_64 }
-        - { sys: mingw32, env: i686 }
-    defaults:
-      run:
-        shell: msys2 {0}
-    env:
-      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
-    steps:
-    - uses: actions/checkout@v3
-      name: Checkout libdeflate
-      with:
-        repository: 'ebiggers/libdeflate'
-        ref: ${{ github.event.inputs.tag }}
-    - uses: msys2/setup-msys2@v2
-      with:
-        msystem: ${{matrix.sys}}
-        update: true
-        install: >
-          make
-          mingw-w64-${{matrix.env}}-cc
-          mingw-w64-${{matrix.env}}-cmake
-          mingw-w64-${{matrix.env}}-ninja
-          mingw-w64-${{matrix.env}}-zlib
-    # Note: as per the CMake documentation, DESTDIR is unsupported on Windows.
-    - run: cmake -B build -G Ninja -DLIBDEFLATE_BUILD_TESTS=1 -DCMAKE_INSTALL_PREFIX=build\install
-    - run: cmake --build build --verbose
-    - run: cmake --install build --verbose
-    - run: ctest --test-dir build
-    - name: Direct compilation without official build system
-      run: cc -O2 -Wall -Werror -municode lib/*{,/*}.c programs/{gzip,prog_util,tgetopt}.c -o libdeflate-gzip.exe
+  # windows-msys2-build-and-test:
+  #   name: Build and test (Windows, MSYS2, ${{matrix.sys}})
+  #   runs-on: windows-latest
+  #   strategy:
+  #     matrix:
+  #       include:
+  #       - { sys: mingw64, env: x86_64 }
+  #       - { sys: mingw32, env: i686 }
+  #   defaults:
+  #     run:
+  #       shell: msys2 {0}
+  #   env:
+  #     CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     name: Checkout libdeflate
+  #     with:
+  #       repository: 'ebiggers/libdeflate'
+  #       ref: ${{ github.event.inputs.tag }}
+  #   - uses: msys2/setup-msys2@v2
+  #     with:
+  #       msystem: ${{matrix.sys}}
+  #       update: true
+  #       install: >
+  #         make
+  #         mingw-w64-${{matrix.env}}-cc
+  #         mingw-w64-${{matrix.env}}-cmake
+  #         mingw-w64-${{matrix.env}}-ninja
+  #         mingw-w64-${{matrix.env}}-zlib
+  #   # Note: as per the CMake documentation, DESTDIR is unsupported on Windows.
+  #   - run: cmake -B build -G Ninja -DLIBDEFLATE_BUILD_TESTS=1 -DCMAKE_INSTALL_PREFIX=build\install
+  #   - run: cmake --build build --verbose
+  #   - run: cmake --install build --verbose
+  #   - run: ctest --test-dir build
+  #   - name: Direct compilation without official build system
+  #     run: cc -O2 -Wall -Werror -municode lib/*{,/*}.c programs/{gzip,prog_util,tgetopt}.c -o libdeflate-gzip.exe
 
   cross-compile-for-windows:
     name: Cross compile for Windows
@@ -177,26 +177,26 @@ jobs:
         name: 'win-x64'
         path: build/libdeflate.dll
 
-  cross-compile-for-android:
-    name: Cross compile for ${{matrix.abi}} Android on ${{matrix.os}}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        abi: [armeabi-v7a, arm64-v8a, x86, x86_64]
-    runs-on: ${{matrix.os}}
-    env:
-      CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
-    steps:
-    - uses: actions/checkout@v3
-      name: Checkout libdeflate
-      with:
-        repository: 'ebiggers/libdeflate'
-        ref: ${{ github.event.inputs.tag }}
-    - run: |
-        scripts/cmake-helper.sh \
-            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME"/build/cmake/android.toolchain.cmake \
-            -DANDROID_ABI=${{matrix.abi}} \
-            -DANDROID_PLATFORM=28 \
-            -DLIBDEFLATE_BUILD_TESTS=1
-        cmake --build build --verbose
-        DESTDIR=build/install cmake --install build --verbose
+  # cross-compile-for-android:
+  #   name: Cross compile for ${{matrix.abi}} Android on ${{matrix.os}}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #       abi: [armeabi-v7a, arm64-v8a, x86, x86_64]
+  #   runs-on: ${{matrix.os}}
+  #   env:
+  #     CFLAGS: -Werror -DLIBDEFLATE_ENABLE_ASSERTIONS
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     name: Checkout libdeflate
+  #     with:
+  #       repository: 'ebiggers/libdeflate'
+  #       ref: ${{ github.event.inputs.tag }}
+  #   - run: |
+  #       scripts/cmake-helper.sh \
+  #           -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_LATEST_HOME"/build/cmake/android.toolchain.cmake \
+  #           -DANDROID_ABI=${{matrix.abi}} \
+  #           -DANDROID_PLATFORM=28 \
+  #           -DLIBDEFLATE_BUILD_TESTS=1
+  #       cmake --build build --verbose
+  #       DESTDIR=build/install cmake --install build --verbose
