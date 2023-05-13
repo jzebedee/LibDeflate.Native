@@ -25,6 +25,10 @@ jobs:
       - name: Setup package folder structure
         run: |
           cd package-contents/runtimes
+          for z in *.zip ; do
+            unzip "$z" -d "${z%.zip}"
+            rm "$z"
+          done
           for d in */ ; do
             mkdir ${d}native ;
             mv ${d}libdeflate* ${d}native/ ;
