@@ -40,33 +40,60 @@ jobs:
         name: 'linux-x64'
         path: build/libdeflate.so
 
-  # other-arch-build-and-test:
-  #   name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
-  #   strategy:
-  #     matrix:
-  #       arch: [armv6, armv7, aarch64]
-  #       compiler: [gcc, clang]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       name: Checkout libdeflate
-  #       with:
-  #         repository: 'ebiggers/libdeflate'
-  #         ref: ${{ github.event.inputs.tag }}
-  #     - uses: uraimo/run-on-arch-action@v2.5.0
-  #       with:
-  #         arch: ${{ matrix.arch }}
-  #         distro: bullseye
-  #         githubToken: ${{ github.token }}
-  #         install: |
-  #           apt-get update
-  #           apt-get install -y build-essential cmake clang llvm libz-dev
-  #         run: |
-  #           tests=(regular)
-  #           if [ ${{matrix.compiler}} = clang ]; then
-  #               tests+=(ubsan)
-  #           fi
-  #           CC=${{matrix.compiler}} scripts/run_tests.sh "${tests[@]}"
+  other-arch-build-and-test:
+    name: Build and test (${{ matrix.arch }}, Debian Bullseye, ${{ matrix.compiler }})
+    strategy:
+      matrix:
+        arch: [armv6, armv7, aarch64]
+        compiler: [gcc]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout libdeflate
+        with:
+          repository: 'ebiggers/libdeflate'
+          ref: ${{ github.event.inputs.tag }}
+      - uses: uraimo/run-on-arch-action@v2.5.0
+        with:
+          arch: ${{ matrix.arch }}
+          distro: bullseye
+          githubToken: ${{ github.token }}
+          env: |
+            CC: ${{ matrix.compiler }}
+          install: |
+            apt-get update
+            apt-get install -y build-essential cmake clang llvm libz-dev
+          run: |
+            tests=(regular)
+            if [ ${{matrix.compiler}} = clang ]; then
+                tests+=(ubsan)
+            fi
+            scripts/run_tests.sh "${tests[@]}"
+            cmake -B build \
+              -DLIBDEFLATE_BUILD_SHARED_LIB=1 \
+              -DLIBDEFLATE_COMPRESSION_SUPPORT=1 \
+              -DLIBDEFLATE_DECOMPRESSION_SUPPORT=1 \
+              -DLIBDEFLATE_ZLIB_SUPPORT=1 \
+              -DLIBDEFLATE_GZIP_SUPPORT=1
+            cmake --build build
+            cp build/libdeflate.so /artifacts/libdeflate.so
+      - name: Set arch options
+        run: |
+          case ${{ matrix.arch }} in
+            armv6)
+              echo "rid=armv6" >> $GITHUB_ENV
+              ;;
+            armv7)
+              echo "rid=arm" >> $GITHUB_ENV
+              ;;
+            aarch64)
+              echo "rid=arm64" >> $GITHUB_ENV
+              ;;
+          esac
+      - uses: actions/upload-artifact@v2
+        with:
+          name: 'linux-${{ env.rid }}'
+          path: ${PWD}/artifacts/libdeflate.so
 
   macos-build-and-test:
     name: Build and test (macOS, ${{ matrix.os }})
