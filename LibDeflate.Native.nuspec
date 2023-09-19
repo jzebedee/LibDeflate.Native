@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>LibDeflate.Native</id>
-    <version>1.18.0.1</version>
+    <version>1.19.0</version>
     <authors>jzebedee</authors>
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/jzebedee/LibDeflate.Native</projectUrl>
