@@ -35,7 +35,7 @@ jobs:
           -DLIBDEFLATE_ZLIB_SUPPORT=1 \
           -DLIBDEFLATE_GZIP_SUPPORT=1
         cmake --build build
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: 'linux-x64'
         path: build/libdeflate.so
@@ -95,7 +95,7 @@ jobs:
               echo "rid=arm64" >> $GITHUB_ENV
               ;;
           esac
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: 'linux-${{ env.rid }}'
           path: artifacts/libdeflate.so
@@ -130,7 +130,7 @@ jobs:
           -DLIBDEFLATE_ZLIB_SUPPORT=1 \
           -DLIBDEFLATE_GZIP_SUPPORT=1
         cmake --build build
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: 'osx.11.0'
         path: build/libdeflate.dylib
@@ -196,7 +196,7 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-i686-w64-mingw32.cmake
         cmake --build build --verbose
         DESTDIR=build/install cmake --install build --verbose
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: 'win-x86'
         path: build/libdeflate.dll
@@ -207,7 +207,7 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=scripts/toolchain-x86_64-w64-mingw32.cmake
         cmake --build build --verbose
         DESTDIR=build/install cmake --install build --verbose
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: 'win-x64'
         path: build/libdeflate.dll
